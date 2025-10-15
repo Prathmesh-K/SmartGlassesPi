@@ -59,6 +59,43 @@ def image_to_speech(
     return str(output_path.resolve())
 
 
+def capture_and_speak(
+    output_wav_path: str = "output.wav",
+    *,
+    ocr_gpu: bool = False,
+    tts_gpu: bool = False,
+    model_path: Optional[str] = None,
+    config_path: Optional[str] = None,
+    fallback_text: str = "No text detected in image.",
+) -> tuple[str, str]:
+    """Capture a photo and convert any detected text to speech.
+    
+    Returns:
+        tuple: (photo_path, audio_path) - paths to captured photo and generated audio
+    """
+    from Camera import capture_photo
+    
+    # Step 1: Capture photo
+    print("📸 Capturing photo...")
+    photo_path = capture_photo()
+    print(f"Photo saved: {photo_path}")
+    
+    # Step 2: Convert image to speech
+    print("🔍 Processing OCR and generating speech...")
+    audio_path = image_to_speech(
+        image_path=photo_path,
+        output_wav_path=output_wav_path,
+        ocr_gpu=ocr_gpu,
+        tts_gpu=tts_gpu,
+        model_path=model_path,
+        config_path=config_path,
+        fallback_text=fallback_text,
+    )
+    
+    print(f"✅ Audio generated: {audio_path}")
+    return photo_path, audio_path
+
+
 def _build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Run OCR on an image and convert the result to speech",
